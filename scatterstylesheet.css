@@ -1,0 +1,44 @@
+body {
+  font: 13px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: none;
+}
+
+.tooltip {	
+    white-space:pre-wrap;
+    position: absolute;			
+    text-align: left;			
+    width: 200px;					
+    height: 70px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}/*Add Tooltip Type here*/
+
+.pan rect {
+				fill: black;
+				opacity: 0.2;
+			}
+
+			.pan text {
+				fill: black;
+				font-size: 18px;
+				text-anchor: middle;
+			}
+
+			.pan:hover rect,
+ 			.pan:hover text {
+				fill: blue;
+			}
