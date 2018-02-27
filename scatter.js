@@ -123,43 +123,64 @@ d3.csv("continent.csv", function (contset){
     console.log(scatterdataset);
             
     //Draw circles using the data    
-    svg.selectAll(".dot")
-        .data(scatterdataset)
-        .enter()
-        .append("circle")
-        .attr("class", "dot")
-        .attr("r", function(d) { return Math.sqrt(d.ec)/.5; })
-        .attr("cx", function(d) {return xScale(d.gdp);})
-        .attr("cy", function(d) {return yScale(d.ecc);})
-        .style("fill", function (d) {
-                            
-                            if (d.continent=="Asia"){return Asia(d.ecc);}
-                            else if (d.continent=="Europe"){return Europe(d.ecc);}
-                            else if (d.continent =="North America"){return NorthA(d.ecc);}
-                            else if (d.continent=="South America"){return SouthA(d.ecc);}
-                            else{return Australia(d.ecc);}    
-        ;})
-        .on("mouseover", function(d) {
-            div.html("<b>"+d.country + "</b><br>"+"Continent: "+ d.continent +"<br>" + "Population: "+ d.population +" million" +"<br>" + "GDP: $" + d.gdp +" trillion"+"<br>"+ "EPC: "+ d.ecc +" million BTUs" + "<br>"+"Total: "+ d.ec + " trillion BTUs")
-                .transition()		
-                .duration(200).ease(d3.easeLinear)		
-                .style("opacity", .9)
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(d) {		
-            div.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
+        svg.append("g")//.attr("class","circle-container")
+            .selectAll(".dot")
+            .data(scatterdataset)
+            .enter()
+            .append("circle")
+            .attr("class", "dot")
+            .attr("r", function(d) { return Math.sqrt(d.ec)/.5; })
+            .attr("cx", function(d) {return xScale(d.gdp);})
+            .attr("cy", function(d) {return yScale(d.ecc);})
+            .style("fill", function (d) {
+
+                                if (d.continent=="Asia"){return Asia(d.ecc);}
+                                else if (d.continent=="Europe"){return Europe(d.ecc);}
+                                else if (d.continent =="North America"){return NorthA(d.ecc);}
+                                else if (d.continent=="South America"){return SouthA(d.ecc);}
+                                else{return Australia(d.ecc);}})
+            .on("mouseover", function(d) {
+                div.html("<b>"+d.country + "</b><br>"+"Continent: "+ d.continent +"<br>" + "Population: "+ d.population +" million" +"<br>" + "GDP: $" + d.gdp +" trillion"+"<br>"+ "EPC: "+ d.ecc +" million BTUs" + "<br>"+"Total: "+ d.ec + " trillion BTUs")
+                    .transition()		
+                    .duration(200).ease(d3.easeLinear)		
+                    .style("opacity", .9)
+                    .style("left", (d3.event.pageX) + "px")		
+                    .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", function(d) {		
+                div.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
         });
         
-        //Legend and stuff    
+        
+        //Write Country names
+        svg.selectAll(".text")
+        .data(scatterdataset)
+        .enter().append("text")
+        .attr("class","text")
+        .style("text-anchor", "start")
+        .attr("x", function(d) {return xScale(d.gdp)-5;})
+        .attr("y", function(d) {return yScale(d.ecc)-10;})
+        .style("fill", "#757a82")
+        .attr("font-weight", "bold")
+        .text(function (d) {return d.country; });
+        
+        /*svg.select(".circle-container").selectAll(".dot").data(scatterdataset).enter()
+            .append("text")
+            .attr("class", "dot")
+            .attr("x", function(d) {return xScale(d.gdp);})
+            .attr("y", function(d) {return yScale(d.ecc);})
+            .text("test");
+        */
+       //Legend and stuff    
         svg.append("rect")
             .attr("x", width-250)
             .attr("y", height-190)
             .attr("width", 220)
             .attr("height", 150)
-            .style("stroke-width", "2px").style("stroke","#ddd");
+            .style("stroke-width", "2px")
+            .style("stroke","#ddd");
 
         svg.append("circle")
             .attr("r", 2)
@@ -215,6 +236,7 @@ function zoomed(){
           
     //Redrawing the circles    
     svg.selectAll(".dot").attr("transform", d3.event.transform)
+    svg.selectAll(".text").attr("transform", d3.event.transform)
           
     //Redrawing the axes with redifined scales
     svg.select(".x.axis")
@@ -257,7 +279,6 @@ svgLegend.append("g")
   .attr("class", "legendEurope")
   .attr("transform", "translate(220,70)")
   .append("text").text("Europe").attr("x",60).attr("y",-10).attr("font-size","12px");
-
 
 var legendEurope = d3.legendColor()
   .shapeWidth(30).shapePadding(0)
