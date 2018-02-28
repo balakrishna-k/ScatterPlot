@@ -1,4 +1,3 @@
-
 var margin = {left: 80, right: 80, top: 50, bottom: 50 }, 
         width = 960 - margin.left -margin.right,
         height = 500 - margin.top - margin.bottom;
@@ -72,7 +71,7 @@ svg.append("text")
     .attr("x", width/2)
     .style("text-anchor", "middle")
     .attr("font-size", "12px")
-    .text("GDP (in Trillion US Dollars) in 2010");
+    .text("GDP (in Trillion US Dollars)");
     
 //Y-axis
 svg.append("g")
@@ -91,7 +90,7 @@ svg.append("text")
     .text("Energy Consumption per Capita (in Million BTUs per person)");
     
 //Defining Zooming behaviour
-var zoom = d3.zoom().scaleExtent([0.5, 2]).on("zoom", zoomed);   
+var zoom = d3.zoom().scaleExtent([0.5, 2]).on("zoom", zoomed);  
 svg.call(zoom);
         
 //Reading data from two files and combining them    
@@ -115,56 +114,60 @@ d3.csv("continent.csv", function (contset){
         
     var title = svg.append("text")
         .text("Energy Consumption, 2010")
-        .attr("x", margin.left/2)
-        .attr("y", margin.top/2)
+        .attr("x", width/2-margin.right-35)
+        .attr("y", margin.top/4-30)
         .attr("font-size","20px")
-        .attr("font-weight","bold").attr("fill","#757a82");    
+        .attr("font-weight","bold").attr("fill","steelblue");    
 
-    console.log(scatterdataset);
-            
+    console.log(scatterdataset); 
+        
     //Draw circles using the data    
-        svg.append("g")//.attr("class","circle-container")
-            .selectAll(".dot")
-            .data(scatterdataset)
-            .enter()
-            .append("circle")
-            .attr("class", "dot")
-            .attr("r", function(d) { return Math.sqrt(d.ec)/.5; })
-            .attr("cx", function(d) {return xScale(d.gdp);})
-            .attr("cy", function(d) {return yScale(d.ecc);})
-            .style("fill", function (d) {
-
-                                if (d.continent=="Asia"){return Asia(d.ecc);}
-                                else if (d.continent=="Europe"){return Europe(d.ecc);}
-                                else if (d.continent =="North America"){return NorthA(d.ecc);}
-                                else if (d.continent=="South America"){return SouthA(d.ecc);}
-                                else{return Australia(d.ecc);}})
-            .on("mouseover", function(d) {
-                div.html("<b>"+d.country + "</b><br>"+"Continent: "+ d.continent +"<br>" + "Population: "+ d.population +" million" +"<br>" + "GDP: $" + d.gdp +" trillion"+"<br>"+ "EPC: "+ d.ecc +" million BTUs" + "<br>"+"Total: "+ d.ec + " trillion BTUs")
-                    .transition()		
-                    .duration(200).ease(d3.easeLinear)		
-                    .style("opacity", .9)
-                    .style("left", (d3.event.pageX) + "px")		
-                    .style("top", (d3.event.pageY - 28) + "px");
+    //.attr("class","circle-container")
+        svg.selectAll(".dot")
+        .data(scatterdataset)
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
+        .attr("r", function(d) { return Math.sqrt(d.ec)/.5; })
+        .attr("cx", function(d) {return xScale(d.gdp);})
+        .attr("cy", function(d) {return yScale(d.ecc);})
+        .style("fill", function (d) {
+                            if (d.continent=="Asia"){return Asia(d.ecc);}
+                            else if (d.continent=="Europe"){return Europe(d.ecc);}
+                            else if (d.continent =="North America"){return NorthA(d.ecc);}
+                            else if (d.continent=="South America"){return SouthA(d.ecc);}
+                            else{return Australia(d.ecc);}})
+        .on("mouseover", function(d) {
+            div.html("<b>"+d.country + "</b><br>"+"Continent: "+ d.continent +"<br>" + "Population: "+ d.population +" million" +"<br>" + "GDP: $" + d.gdp +" trillion"+"<br>"+ "EPC: "+ d.ecc +" million BTUs" + "<br>"+"Total: "+ d.ec + " trillion BTUs")
+                .transition()		
+                .duration(200).ease(d3.easeLinear)		
+                .style("opacity", .9)
+                .style("left", (d3.event.pageX+20) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");
+                
+            d3.select(this).attr("stroke","yellow").attr("stroke-width","3px");            
             })
             .on("mouseout", function(d) {		
                 div.transition()		
                     .duration(500)		
                     .style("opacity", 0);	
+                
+                d3.select(this).attr("stroke","orange").attr("stroke-width","0px");
+            
         });
-        
         
         //Write Country names
         svg.selectAll(".text")
-        .data(scatterdataset)
-        .enter().append("text")
-        .attr("class","text")
-        .style("text-anchor", "start")
-        .attr("x", function(d) {return xScale(d.gdp)-5;})
-        .attr("y", function(d) {return yScale(d.ecc)-10;})
-        .style("fill", "#757a82")
-        .attr("font-weight", "bold")
-        .text(function (d) {return d.country; });
+            .data(scatterdataset)
+            .enter().append("text")
+            .attr("class","text")
+            .style("text-anchor", "start")
+            .attr("x", function(d) {return xScale(d.gdp)-(Math.sqrt(d.ec)/.5-10);})
+            .attr("y", function(d) {return yScale(d.ecc)-(Math.sqrt(d.ec)/.5)-2;})
+            .style("fill", "#757a82")
+            .attr("font-weight", "bold")
+            .text(function (d) {return d.country; });
+        
         
         /*svg.select(".circle-container").selectAll(".dot").data(scatterdataset).enter()
             .append("text")
@@ -231,13 +234,25 @@ d3.csv("continent.csv", function (contset){
             .text("Total Energy Consumption");
     });
 }); 
-    
+
+var clipper = svg.append("clipPath")
+            .attr("id","clipper").append("rect")
+            .attr("x", -22)
+            .attr("y", -10)
+            .attr("width", 830)
+            .attr("height", 420); 
+
 function zoomed(){
-          
+                 
+    console.log(this);
     //Redrawing the circles    
-    svg.selectAll(".dot").attr("transform", d3.event.transform)
-    svg.selectAll(".text").attr("transform", d3.event.transform)
-          
+    svg.selectAll(".dot").attr("transform", d3.event.transform);
+    
+    //d3.select(this).selectAll(".dot").attr("clip-path","url(#clipper)");
+    
+    svg.selectAll(".text").attr("transform", d3.event.transform);
+    //var transform = svg.selectAll(".dot").getAttribute("transform");
+    
     //Redrawing the axes with redifined scales
     svg.select(".x.axis")
         .call(xAxis.scale(d3.event.transform.rescaleX(xScale)))        
@@ -249,80 +264,81 @@ function zoomed(){
 // draw legend colored rectangles
 var svgLegend = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height/4 + margin.top + margin.bottom-15)
+    .attr("height", height/4 + margin.top + margin.bottom-80)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + 0 + ")");   
-    
-svgLegend.append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", width)
-    .attr("height", height/2)
-    .style("stroke-width", "0px").style("stroke","#ddd");
-    
-svgLegend.append("text").text("Color Scale as per EPC, in millions of BTUs").attr("x", width/2-100).attr("y",30);    
-    
+    .attr("transform", "translate(" + (margin.left + 40) + "," + -20 + ")");   
+       
+svgLegend.append("text").text("EPC in millions of BTUs").attr("x", width/2-110).attr("y",140).attr("font-size","11px");    
+
 svgLegend.append("g")
   .attr("class", "legendAsia")
   .attr("transform", "translate(20,70)")
-  .append("text").text("Asia").attr("x",70).attr("y",-10).attr("font-size","12px");
+  .append("text");
 
 var legendAsia = d3.legendColor()
-  .shapeWidth(30).shapePadding(0)
+  .title("Asia")
+  .shapeWidth(25).shapePadding(0)
   .orient('horizontal')
-  .scale(Asia);
+  .labelFormat(d3.format(".0f"))
+  .scale(Asia.nice());
 
 svgLegend.select(".legendAsia")
   .call(legendAsia);  
     
 svgLegend.append("g")
   .attr("class", "legendEurope")
-  .attr("transform", "translate(220,70)")
-  .append("text").text("Europe").attr("x",60).attr("y",-10).attr("font-size","12px");
+  .attr("transform", "translate(160,70)")
+  .append("text");
 
 var legendEurope = d3.legendColor()
-  .shapeWidth(30).shapePadding(0)
-  .orient('horizontal')
-  .scale(Europe);
+  .title("Europe")
+  .shapeWidth(25).shapePadding(0)
+  .orient('horizontal').labelFormat(d3.format(".0f"))
+  .scale(Europe.nice());
 
 svgLegend.select(".legendEurope")
   .call(legendEurope);
     
 svgLegend.append("g")
   .attr("class", "legendNA")
-  .attr("transform", "translate(420,70)")
-  .append("text").text("North America").attr("x",40).attr("y",-10).attr("font-size","12px");
+  .attr("transform", "translate(300,70)")
+  .append("text");
 
 var legendNA = d3.legendColor()
-  .shapeWidth(30).shapePadding(0)
+  .title("North America")
+  .shapeWidth(25).shapePadding(0)
   .orient('horizontal')
-  .scale(NorthA);
+  .labelFormat(d3.format(".0f"))
+  .scale(NorthA.nice());
 
 svgLegend.select(".legendNA")
   .call(legendNA);
     
 svgLegend.append("g")
   .attr("class", "legendSA")
-  .attr("transform", "translate(620,70)")
-  .append("text").text("South America").attr("x",40).attr("y",-10).attr("font-size","12px");
+  .attr("transform", "translate(440,70)")
+  .append("text");
     
 var legendSA = d3.legendColor()
-  .shapeWidth(30).shapePadding(0)
-  .orient('horizontal')
-  .scale(SouthA);
+  .title("South America")
+  .shapeWidth(25).shapePadding(0)
+  .orient('horizontal').labelFormat(d3.format(".0f"))
+  .scale(SouthA.nice());
 
 svgLegend.select(".legendSA")
   .call(legendSA);  
     
 svgLegend.append("g")
   .attr("class", "legendAus")
-  .attr("transform", "translate(320,140)")
-  .append("text").text("Australia").attr("x",50).attr("y",-10).attr("font-size","12px");
+  .attr("transform", "translate(580,70)")
+  .append("text");
 
 var legendAus = d3.legendColor()
-  .shapeWidth(30).shapePadding(0)
+  .title("Australia")
+  .shapeWidth(25).shapePadding(0)
   .orient('horizontal')
-  .scale(Australia);
+  .labelFormat(d3.format(".0f"))
+  .scale(Australia.nice());
 
 svgLegend.select(".legendAus")
   .call(legendAus);         

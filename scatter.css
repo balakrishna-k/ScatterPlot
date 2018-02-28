@@ -5,6 +5,10 @@ svg {
     rect {
       fill: #fff;  
     }
+
+.label{
+   visibility: visible; 
+}
   
     .tooltip {	
         white-space:pre-wrap;
@@ -41,3 +45,14 @@ svg {
         fill: none;
         stroke: #ddd;
     }
+
+.selected{
+    stroke: "darkgrey";
+    stroke-width: 2px;
+}
+
+.legendTitle{
+    font-weight: bold;
+    align-content: center;
+    fill: #757a82;
+}
